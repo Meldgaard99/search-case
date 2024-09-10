@@ -1,4 +1,4 @@
-namespace ConsoleSearch
+namespace Shared
 {
     public class Config
     {

@@ -1,4 +1,7 @@
 using ConsoleSearch;
+using SearchAPI;
+using Shared;
+using Shared.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 

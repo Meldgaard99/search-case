@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shared.Interface;
 
-namespace ConsoleSearch
+namespace Shared
 {
     public class SearchLogic
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Shared.Model;
 
-namespace ConsoleSearch
+namespace Shared.Interface
 {
     public interface IDatabase
     {

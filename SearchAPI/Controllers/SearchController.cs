@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ConsoleSearch;
+using Shared;
+using Shared.Interface;
 using Shared.Model;
 
 namespace SearchAPI.Controllers
