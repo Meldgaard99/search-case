@@ -1,32 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
+using ConsoleSearch;
+using Shared.Model;
 
-namespace SearchAPI.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class SearchController : ControllerBase
+namespace SearchAPI.Controllers
 {
-    private static readonly string[] Summaries = new[]
+    [ApiController]
+    [Route("[controller]")]
+    public class DocumentsController : ControllerBase
     {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+        private readonly IDatabase _database;
 
-    private readonly ILogger<SearchController> _logger;
+        public DocumentsController(IDatabase database)
+        {
+            _database = database;
+        }
 
-    public SearchController(ILogger<SearchController> logger)
-    {
-        _logger = logger;
-    }
-
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
-    {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+        [HttpGet("search")]
+        public ActionResult<List<BEDocument>> SearchDocuments([FromQuery] string query)
+        {
+            var words = query.Split(' ');
+            var wordIds = _database.GetWordIds(words, out var ignoredWords);
+            var docIds = _database.GetDocuments(wordIds).Select(kvp => kvp.Key).ToList();
+            var documents = _database.GetDocDetails(docIds);
+            return Ok(documents);
+        }
     }
 }
