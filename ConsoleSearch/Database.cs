@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Data.Sqlite;
 using Shared;
 using Shared.Model;
-using Microsoft.Data.Sqlite;
 
 namespace ConsoleSearch
 {
@@ -42,15 +41,6 @@ namespace ConsoleSearch
         {
             var res = new List<KeyValuePair<int, int>>();
 
-            /* Example sql statement looking for doc id's that
-               contain words with id 2 and 3
-            
-               SELECT docId, COUNT(wordId) as count
-                 FROM Occ
-                WHERE wordId in (2,3)
-             GROUP BY docId
-             ORDER BY COUNT(wordId) DESC 
-             */
 
             var sql = "SELECT docId, COUNT(wordId) as count FROM Occ where ";
             sql += "wordId in " + AsString(wordIds) + " GROUP BY docId ";

@@ -1,42 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shared.Model;
 
 namespace ConsoleSearch
 {
     public class SearchLogic
     {
-        IDatabase mDatabase;
+        private readonly IDatabase mDatabase;
+        private readonly Config mConfig; 
 
-        Dictionary<string, int> mWords;
-
-        public SearchLogic(IDatabase database)
+        public SearchLogic(IDatabase database, Config config)
         {
             mDatabase = database;
+            mConfig = config;
+            
         }
 
         /* Perform search of documents containing words from query. The result will
-         * contain details about amost maxAmount of documents.
+         * contain details about at most maxAmount of documents.
          */
-        public SearchResult Search(String[] query, int maxAmount)
+        public SearchResult Search(string[] query, int maxAmount)
         {
             List<string> ignored;
 
             DateTime start = DateTime.Now;
 
-            // Convert words to wordids
+            // Apply case sensitivity if enabled
+            if (!mConfig.CaseSensitive)
+            {
+                for (int i = 0; i < query.Length; i++)
+                {
+                    query[i] = query[i].ToLower();
+                }
+            }
+            
+            
+
+            // Convert words to wordIds
             var wordIds = mDatabase.GetWordIds(query, out ignored);
 
-            // perform the search - get all docIds
-            var docIds =  mDatabase.GetDocuments(wordIds);
+            // Perform the search - get all docIds
+            var docIds = mDatabase.GetDocuments(wordIds);
 
-            // get ids for the first maxAmount             
+            // Get ids for the first maxAmount             
             var top = new List<int>();
             foreach (var p in docIds.GetRange(0, Math.Min(maxAmount, docIds.Count)))
                 top.Add(p.Key);
 
-            // compose the result.
-            // all the documentHit
+            // Compose the result
             List<DocumentHit> docresult = new List<DocumentHit>();
             int idx = 0;
             foreach (var doc in mDatabase.GetDocDetails(top))
