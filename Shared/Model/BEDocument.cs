@@ -5,11 +5,11 @@ namespace Shared.Model
     {
         public int mId;
 
-        public String mUrl;
+        public String mUrl { get; set; }
 
-        public String mIdxTime;
+        public String mIdxTime { get; set; }
 
-        public String mCreationTime;
+        public String mCreationTime { get; set; }
 
     }
 }

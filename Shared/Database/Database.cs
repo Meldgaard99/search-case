@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using Shared.Interface;
 using Shared.Model;
 
-namespace Shared
+namespace Shared.Database
 {
     public class Database : IDatabase
     {
