@@ -3,7 +3,7 @@ namespace Shared.Model
 {
     public class BEDocument
     {
-        public int mId;
+        public int mId { get; set; }
 
         public String mUrl { get; set; }
 
@@ -12,4 +12,5 @@ namespace Shared.Model
         public String mCreationTime { get; set; }
 
     }
+    
 }

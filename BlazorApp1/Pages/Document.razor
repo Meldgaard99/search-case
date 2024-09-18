@@ -1,0 +1,55 @@
+@page "/search"
+@using global::Shared.Model
+@inject HttpClient Http
+
+
+
+<h3>Søg efter dokumenter</h3>
+
+<input type="text" @bind="query" placeholder="Indtast søgeord..." />
+<button @onclick="SearchDocuments">Søg</button>
+
+
+@if (resultCount > 0)
+{
+    <p>@resultCount dokumenter fundet:</p>
+    <ul>
+        @foreach (var doc in searchResults)
+        {
+            <li>@doc.mUrl</li>
+        }
+    </ul>
+}
+
+else
+{
+    <p>Ingen resultater fundet</p>
+}
+
+@code {
+    private string query;
+    private List<BEDocument> searchResults = new();
+    // Variabel til at gemme antallet af fundne resultater
+    private int resultCount;
+    // Variabel til at holde styr på, om der søges
+    private bool isSearching = false;
+    // Metode til at udføre søgningen ved at kalde API'et
+    private async Task SearchDocuments()
+    {
+        if (string.IsNullOrWhiteSpace(query)) return;
+        
+        {
+            var response = await Http.GetFromJsonAsync<SearchResponse>($"http://localhost:5102/Documents/search?query={query}");
+
+            searchResults = response.Results;
+            resultCount = response.Count;
+        }
+    }
+
+    public class SearchResponse
+    {
+        public List<BEDocument> Results { get; set; }
+        public int Count { get; set; }
+        public string CountMessage { get; set; }
+    }
+}

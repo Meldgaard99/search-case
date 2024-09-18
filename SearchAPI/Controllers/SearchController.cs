@@ -16,9 +16,11 @@ namespace SearchAPI.Controllers
         {
             _database = database;
         }
+        
+ 
 
         [HttpGet("search")]
-        public ActionResult<List<BEDocument>> SearchDocuments([FromQuery] string query)
+        public IActionResult SearchDocuments([FromQuery] string query)
         {
             //out skal være sat? men returnerer ikke noget jeg skal bruge??
             // Hent word ID baseret på det ene ord og sætter det i et array 
