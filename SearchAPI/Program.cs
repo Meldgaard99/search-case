@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5073") // URL'en til din Blazor WebAssembly-app
+        policy.WithOrigins("http://localhost:5073") // URL'en til api 
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
