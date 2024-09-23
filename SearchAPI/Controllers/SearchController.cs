@@ -5,7 +5,7 @@ using Shared.Model;
 namespace SearchAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class DocumentsController : ControllerBase
     {
         private readonly IDatabase _database;
