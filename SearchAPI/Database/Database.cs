@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
+using Shared;
 using Shared.Interface;
 using Shared.Model;
 
-namespace Shared.Database
+namespace SearchAPI.Database
 {
     public class Database : IDatabase
     {
