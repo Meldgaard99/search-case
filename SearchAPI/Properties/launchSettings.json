@@ -36,15 +36,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "LoadBalancer": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "http://localhost:5105",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
+
     "HTTPS": {
       "commandName": "Project",
       "dotnetRunMessages": true,

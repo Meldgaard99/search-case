@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Threading.Tasks;
+
 
 namespace SearchAPI.Controllers
 {
@@ -32,12 +31,11 @@ namespace SearchAPI.Controllers
                     response.EnsureSuccessStatusCode();
 
                     var content = await response.Content.ReadAsStringAsync();
-            
-                    // Include information about which server handled the request
-                    return Ok(new 
-                    { 
-                        Server = backendUrl, 
-                        Response = content 
+
+                    return Ok(new
+                    {
+                        BackendServer = backendUrl,
+                        SearchResult = content
                     });
                 }
                 catch (HttpRequestException ex)
@@ -48,11 +46,19 @@ namespace SearchAPI.Controllers
         }
         
 
-        // Round-robin strategy to select the next server
         private string GetNextBackendUrl()
         {
             var url = backendUrls[currentServerIndex];
-            currentServerIndex = (currentServerIndex + 1) % backendUrls.Length;
+
+            // Increment the index to point to the next server
+            currentServerIndex++;
+
+            // If the index is out of bounds, reset it to 0
+            if (currentServerIndex >= backendUrls.Length)
+            {
+                currentServerIndex = 0;
+            }
+
             return url;
         }
     }
