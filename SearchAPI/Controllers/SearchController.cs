@@ -15,7 +15,7 @@ namespace SearchAPI.Controllers
             _database = database;
         }
         
-        [HttpGet]
+        [HttpGet("search")]  
         public IActionResult SearchDocuments([FromQuery] string query)
         {
             //out skal være sat? men returnerer ikke noget jeg skal bruge??
