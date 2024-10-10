@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Shared;
 using Shared.Interface;
 
-namespace Shared
+namespace SearchAPI
 {
     public class SearchLogic
     {

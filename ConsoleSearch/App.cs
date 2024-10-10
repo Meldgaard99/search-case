@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Shared;
-using Shared.Database;
+
 
 
 namespace ConsoleSearch
@@ -9,69 +12,46 @@ namespace ConsoleSearch
     public class App
     {
         private Config _config = new Config();  // Instance of the config class
+        private static readonly HttpClient client = new HttpClient(); 
 
         public App()
         {
+            client.BaseAddress = new Uri("http://localhost:5102/");
         }
-
-        public void Run()
+        public async Task RunAsync()
         {
-            SearchLogic mSearchLogic = new SearchLogic(new Database(), _config);
-
             Console.WriteLine("Console Search");
 
             while (true)
             {
-                Console.WriteLine("Enter search terms - 'q' for quit, 'cs' to toggle case sensitivity, '/timestamp=on' or '/timestamp=off' to show/hide timestamp\")");
+                Console.WriteLine("Enter search terms - 'q' to quit:");
                 string input = Console.ReadLine();
-                
-                if (input.Equals("q")) break;
-
-                if (input.Equals("cs"))
-                {
-                    _config.CaseSensitive = !_config.CaseSensitive;  
-                    Console.WriteLine("Case sensitivity is now " + (_config.CaseSensitive ? "ON" : "OFF"));
-                    continue;
-                }
-                
-                if (input.Equals("/timestamp=on"))
-                {
-                    _config.ShowTimeStamps = true;
-                    Console.WriteLine("Timestamp display is now ON");
-                    continue;
-                }
-                if (input.Equals("/timestamp=off"))
-                {
-                    _config.ShowTimeStamps = false;
-                    Console.WriteLine("Timestamp display is now OFF");
-                    continue;
-                    
-                }
+                if (input.Equals("q", StringComparison.OrdinalIgnoreCase)) break;
 
                 var query = input.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                var queryString = string.Join(",", query);
 
-                var result = mSearchLogic.Search(query, 10);
-
-                if (result.Ignored.Count > 0)
+                try
                 {
-                    Console.WriteLine($"Ignored: {string.Join(',', result.Ignored)}");
-                }
+                    // Make the HTTP GET request to the SearchAPI
+                    var s = $"api/Documents?query={Uri.EscapeDataString(queryString)}";
+                    var response = await client.GetAsync(s);
+                    response.EnsureSuccessStatusCode();
+                    var responseData = await response.Content.ReadAsStringAsync();
 
-                int idx = 1;
-                foreach (var doc in result.DocumentHits)
-                {
-                    Console.WriteLine($"{idx} : {doc.Document.mUrl} -- contains {doc.NoOfHits} search terms");
-                    Console.WriteLine("Index time: " + doc.Document.mIdxTime);
-                    Console.WriteLine($"Missing: {ArrayAsString(doc.Missing.ToArray())}");
-                    idx++;
+                    Console.WriteLine("Search results:");
+                    Console.WriteLine(responseData);
                 }
-                Console.WriteLine("Documents: " + result.Hits + ". Time: " + result.TimeUsed.TotalMilliseconds);
+                catch (HttpRequestException ex)
+                {
+                    Console.WriteLine($"Request error: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
             }
-        }
-
-        string ArrayAsString(string[] s)
-        {
-            return s.Length == 0 ? "[]" : $"[{String.Join(',', s)}]";
         }
     }
 }
+        

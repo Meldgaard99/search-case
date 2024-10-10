@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ConsoleSearch;
-using Shared;
 using Shared.Interface;
 using Shared.Model;
 
@@ -17,9 +15,7 @@ namespace SearchAPI.Controllers
             _database = database;
         }
         
- 
-
-        [HttpGet("search")]
+        [HttpGet("search")]  
         public IActionResult SearchDocuments([FromQuery] string query)
         {
             //out skal være sat? men returnerer ikke noget jeg skal bruge??
@@ -42,9 +38,7 @@ namespace SearchAPI.Controllers
                 }).ToList();
             
             var counter = result.Count;
-            
 
             return Ok(new { Results = result, countMessage = "der er følgende antal hits ", Count = counter });        }
-
         }
     }
