@@ -1,0 +1,30 @@
+# Brug en base image for Nginx til at servere Blazor
+FROM nginx:alpine AS base
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Build image
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+
+# Copy Shared project
+COPY ["Shared/Shared.csproj", "Shared/"]
+
+# Copy frontend (Blazor)
+COPY ["BlazorApp1/BlazorApp1.csproj", "BlazorApp1/"]
+
+# Restore dependencies for both frontend and shared
+RUN dotnet restore "BlazorApp1/BlazorApp1.csproj"
+
+# Copy all files
+COPY . .
+
+# Publish frontend
+RUN dotnet publish "BlazorApp1/BlazorApp1.csproj" -c Release -o /app/publish
+
+# Final image
+FROM base AS final
+
+# Copy published frontend to Nginx html directory
+COPY --from=build /app/publish /usr/share/nginx/html

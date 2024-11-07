@@ -1,0 +1,34 @@
+# Use base image for .NET runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+# Build image
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+
+# Copy project files
+COPY ["SearchAPI/SearchAPI.csproj", "SearchAPI/"]
+COPY ["Shared/Shared.csproj", "Shared/"]
+
+# Restore dependencies
+RUN dotnet restore "SearchAPI/SearchAPI.csproj"
+
+# Copy all source code
+COPY . .
+
+# Publish the application
+RUN dotnet publish "SearchAPI/SearchAPI.csproj" -c Release -o /app/publish
+
+# Final image
+FROM base AS final
+WORKDIR /app
+
+# Copy published application
+COPY --from=build /app/publish .
+
+# Copy Data directory into the image
+COPY Data ./Data
+
+# Set entrypoint
+ENTRYPOINT ["dotnet", "SearchAPI.dll"]

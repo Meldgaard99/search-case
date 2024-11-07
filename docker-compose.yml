@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  searchapi:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-searchapi
+    container_name: searchapi
+    ports:
+      - "5100:80"
+    networks:
+      - searchnetwork
+
+  blazor:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-blazor
+    container_name: blazor
+    ports:
+      - "5101:80"
+    networks:
+      - searchnetwork
+
+networks:
+  searchnetwork:
+    driver: bridge

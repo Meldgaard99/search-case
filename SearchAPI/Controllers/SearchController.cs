@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interface;
 using Shared.Model;
+using Microsoft.Extensions.Logging;
+using NLog;
+
 
 namespace SearchAPI.Controllers
 {
@@ -9,25 +12,41 @@ namespace SearchAPI.Controllers
     public class DocumentsController : ControllerBase
     {
         private readonly IDatabase _database;
+        private readonly ILogger<DocumentsController> _logger;
 
-        public DocumentsController(IDatabase database)
+        public DocumentsController(IDatabase database, ILogger<DocumentsController> logger)
         {
             _database = database;
+            _logger = logger;
         }
         
         [HttpGet("search")]  
         public IActionResult SearchDocuments([FromQuery] string query)
         {
-            //out skal være sat? men returnerer ikke noget jeg skal bruge??
-            // Hent word ID baseret på det ene ord og sætter det i et array 
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                _logger.LogWarning("Query parameter is empty or null.");
+                return BadRequest("Query parameter cannot be empty.");
+            }
+
+            _logger.LogInformation("Searching for query: {Query}", query);
+
             var wordIds = _database.GetWordIds(new[] { query }, out _);
-    
-            // Hent dokument-IDs baseret på word IDs
+            if (wordIds == null || !wordIds.Any())
+            {
+                _logger.LogInformation("No word IDs found for query: {Query}", query);
+                return Ok(new { Results = new List<BEDocument>(), countMessage = "der er følgende antal hits ", Count = 0 });
+            }
+
             var docIds = _database.GetDocuments(wordIds)
                 .Select(kvp => kvp.Key)
                 .ToList();
+            if (!docIds.Any())
+            {
+                _logger.LogInformation("No document IDs found for word IDs.");
+                return Ok(new { Results = new List<BEDocument>(), countMessage = "der er følgende antal hits ", Count = 0 });
+            }
 
-            // Hent dokumentdetaljer og opret BEDocument-objekter
             var result = _database.GetDocDetails(docIds)
                 .Select(document => new BEDocument
                 {
@@ -39,6 +58,10 @@ namespace SearchAPI.Controllers
             
             var counter = result.Count;
 
-            return Ok(new { Results = result, countMessage = "der er følgende antal hits ", Count = counter });        }
+            _logger.LogInformation("Found {Count} documents for query: {Query}", counter, query);
+//            var logger = NLog.LogManager.LoadConfiguration("NLog.config").GetCurrentClassLogger();
+
+            return Ok(new { Results = result, countMessage = "der er følgende antal hits ", Count = counter });
         }
     }
+}
