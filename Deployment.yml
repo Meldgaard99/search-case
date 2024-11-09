@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blazor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blazor
+  template:
+    metadata:
+      labels:
+        app: blazor
+    spec:
+      containers:
+        - name: blazor
+          image: search-case-test-blazor:latest # Replace with your actual image name and tag
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:80"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blazor-service
+spec:
+  selector:
+    app: blazor
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searchapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: searchapi
+  template:
+    metadata:
+      labels:
+        app: searchapi
+    spec:
+      containers:
+        - name: searchapi
+          image: search-case-test-searchapi:latest 
+          ports:
+            - containerPort: 80
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:80"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: searchapi-service
+spec:
+  selector:
+    app: searchapi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: localhost 
+      http:
+        paths:
+          - path: /blazor
+            pathType: Prefix
+            backend:
+              service:
+                name: blazor-service
+                port:
+                  number: 80
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: searchapi-service
+                port:
+                  number: 80

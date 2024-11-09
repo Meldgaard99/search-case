@@ -6,7 +6,6 @@ using Shared.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -19,11 +18,12 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5073") // URL'en til api 
+        policy.WithOrigins("http://localhost:5101")  
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
 });
+
 
 var app = builder.Build();
 

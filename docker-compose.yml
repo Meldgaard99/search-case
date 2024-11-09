@@ -9,6 +9,8 @@ services:
       - "5100:80"
     networks:
       - searchnetwork
+    volumes: 
+      - ./Data:/app/Data
 
   blazor:
     build:
@@ -23,3 +25,4 @@ services:
 networks:
   searchnetwork:
     driver: bridge
+
